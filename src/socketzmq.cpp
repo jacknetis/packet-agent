@@ -118,16 +118,16 @@ int PcapExportZMQ::exportPacket(size_t index, const struct pcap_pkthdr* header, 
                                   htonl((uint32_t)header->caplen),
                                   htonl((uint32_t)header->len) };
     auto& buf = pkts_buf.buf;
-    if (pkts_buf.batch_hdr.pkts_num >= 65535
-        || header->ts.tv_sec > pkts_buf.first_pktsec + MAX_PKTS_TIMEDIFF_S // 3 second timeout
-        || pkts_buf.batch_bufpos + sizeof(length) + sizeof(small_pkthdr) + length > MAX_BATCH_BUF_LENGTH) {
-
-        drop_pkts_num = flushBatchBuf(index);
-
-        pkts_buf.first_pktsec = header->ts.tv_sec;
-        pkts_buf.batch_bufpos = sizeof(pkts_buf.batch_hdr);
-        pkts_buf.batch_hdr.pkts_num = 0;
-    }
+//    if (pkts_buf.batch_hdr.pkts_num >= 65535
+//        || header->ts.tv_sec > pkts_buf.first_pktsec + MAX_PKTS_TIMEDIFF_S // 3 second timeout
+//        || pkts_buf.batch_bufpos + sizeof(length) + sizeof(small_pkthdr) + length > MAX_BATCH_BUF_LENGTH) {
+//
+//        drop_pkts_num = flushBatchBuf(index);
+//
+//        pkts_buf.first_pktsec = header->ts.tv_sec;
+//        pkts_buf.batch_bufpos = sizeof(pkts_buf.batch_hdr);
+//        pkts_buf.batch_hdr.pkts_num = 0;
+//    }
 
     uint16_t hlen = htons(length);
     std::memcpy(&(buf[pkts_buf.batch_bufpos]), &hlen, sizeof(hlen));
@@ -135,5 +135,12 @@ int PcapExportZMQ::exportPacket(size_t index, const struct pcap_pkthdr* header, 
     std::memcpy(&(buf[pkts_buf.batch_bufpos + sizeof(length) + sizeof(small_pkthdr)]), pkt_data, length);
     pkts_buf.batch_bufpos += sizeof(length) + sizeof(small_pkthdr) + length;
     pkts_buf.batch_hdr.pkts_num++;
+
+    {
+        drop_pkts_num = flushBatchBuf(index);
+        pkts_buf.first_pktsec = header->ts.tv_sec;
+        pkts_buf.batch_bufpos = sizeof(pkts_buf.batch_hdr);
+        pkts_buf.batch_hdr.pkts_num = 0;
+    }
     return drop_pkts_num;
 }
