@@ -34,7 +34,7 @@ int main(int argc, const char* argv[]) {
             ("zmq_port,z", boost::program_options::value<int>()->default_value(0)->value_name("ZMQ_PORT"),
              "set remote zeromq server port to receive packets reliably; ZMQ_PORT default value 0 means disable.")
             ("zmq_hwm,m", boost::program_options::value<int>()->default_value(100000)->value_name("ZMQ_HWM"),
-             "set zeromq queue high watermark; ZMQ_HWM default value 100.")
+             "set zeromq queue high watermark; ZMQ_HWM default value 100000.")
             ("keybit,k", boost::program_options::value<int>()->default_value(1)->value_name("BIT"),
              "set gre key bit; BIT defaults 1")
             ("snaplen,s", boost::program_options::value<int>()->default_value(2048)->value_name("LENGTH"),
